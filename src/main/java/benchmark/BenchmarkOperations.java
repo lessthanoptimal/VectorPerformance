@@ -12,13 +12,13 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 3)
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkOperations {
-    @Param({"1000"})
+    @Param({"10","1000"})
     public int size;
 
     DMatrixRMaj A = new DMatrixRMaj(1, 1);
@@ -37,11 +37,11 @@ public class BenchmarkOperations {
         RandomMatrices_DDRM.fillUniform(C, -1, 1, rand);
     }
 
-    @Benchmark public void ejml() {
+    @Benchmark public void matrix_mult_ejml() {
         MatrixMultiplication.mult_reorder(A, B, C);
     }
 
-    @Benchmark public void vectors() {
+    @Benchmark public void matrix_mult_vectors() {
         MatrixMultiplication.mult_reorder_vector(A, B, C);
     }
 

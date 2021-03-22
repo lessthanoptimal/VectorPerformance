@@ -37,6 +37,10 @@ dependencies {
     ['ejml-core','ejml-ddense'].each { String a ->
         api group: 'org.ejml', name: a, version: '0.40'}
 
+    ['boofcv-ip'].each {
+        String a -> implementation group: 'org.boofcv', name: a, version: '0.36'
+    }
+
     testImplementation( 'org.junit.jupiter:junit-jupiter-api:5.4.0')
     testRuntimeOnly( 'org.junit.jupiter:junit-jupiter-engine:5.4.0')
 }

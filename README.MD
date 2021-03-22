@@ -20,7 +20,7 @@ is using bleeding edge version of Gradle with a bleeding edge JDK, and a new API
 Setup
 * OpenJDK 64-Bit Server VM AdoptOpenJDK (build 16+36, mixed mode, sharing)
 * Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
-* Description:	Ubuntu 18.04.5 LTS
+* Ubuntu 18.04.5 LTS
 
 Summary
 * Matrix Multiplication IKJ Order, Large [1]: 1.71x faster
@@ -67,6 +67,6 @@ to write faster code and just easier to write image processing code. The other m
 support unsigned bytes yet and the Vector implementation fails the unit test. Based on comments in the JDK looks
 like that is planned.
 
-Author:
-Peter Abeles
+Author: Peter Abeles
+
 https://twitter.com/NotSoOptimal

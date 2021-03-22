@@ -1,4 +1,4 @@
-Proof of concept testing using new Vector API ([JEP 338](https://openjdk.java.net/jeps/338)). Vectorized code is compared against already optimized code from 
+Proof of concept test using new Vector API ([JEP 338](https://openjdk.java.net/jeps/338)). Vectorized code is compared against already optimized code from 
 [EJML](https://ejml.org) and [BoofCV](https://boofcv.org).
 
 * [Matrix Multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication) IKJ Order (double)

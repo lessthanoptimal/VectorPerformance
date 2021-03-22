@@ -48,4 +48,8 @@ class MatrixMultiplicationTest {
 
         assertTrue(MatrixFeatures_DDRM.isIdentical(found, expected, UtilEjml.TEST_F64));
     }
+
+    @Test void foo() {
+        fail("implement");
+    }
 }

@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 group 'lessthanoptimal'
 version '0.1'
@@ -9,36 +9,15 @@ java {
     toolchain { languageVersion = JavaLanguageVersion.of(16) }
 }
 
-//tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
-//tasks.withType(JavaCompile) { options.incremental = true }
-//tasks.withType(JavaCompile) { options.compilerArgs.addAll([
-//        '--enable-preview','--add-modules',
-//        'jdk.incubator.vector']) }
+javadoc { configure(options) { enabled=false } }
+test { useJUnitPlatform() }
 
-//tasks.withType(JavaCompile) {
-//    options.compilerArgs.addAll(["--enable-preview",'--add-modules','jdk.incubator.vector'])
-//}
-//tasks.withType(Test) {
-//    jvmArgs.addAll(["--enable-preview",'--add-modules','jdk.incubator.vector'])
-//}
-//tasks.withType(JavaExec) {
-//    jvmArgs.addAll(["--enable-preview",'--add-modules','jdk.incubator.vector'])
-//}
-
-compileJava {
+tasks.withType(AbstractCompile) {
     options.compilerArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
 }
 
-compileTestJava {
-    options.compilerArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
-}
-
-test {
+tasks.withType(Test) {
     jvmArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
-}
-
-tasks.withType( JavaCompile ).configureEach {
-    options.forkOptions.jvmArgs.addAll( ['--add-opens', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'] )
 }
 
 repositories {
@@ -51,12 +30,12 @@ repositories {
 
 dependencies {
     ['1.27'].each { String a ->
-        compile('org.openjdk.jmh:jmh-core:' + a)
+        api('org.openjdk.jmh:jmh-core:' + a)
         annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:' + a
     }
 
     ['ejml-core','ejml-ddense'].each { String a ->
-        compile group: 'org.ejml', name: a, version: '0.40'}
+        api group: 'org.ejml', name: a, version: '0.40'}
 
     testImplementation( 'org.junit.jupiter:junit-jupiter-api:5.4.0')
     testRuntimeOnly( 'org.junit.jupiter:junit-jupiter-engine:5.4.0')
@@ -65,5 +44,5 @@ dependencies {
 
 wrapper {
     distributionType = Wrapper.DistributionType.BIN
-    gradleVersion = '6.8.3'
+    gradleVersion = '7.0-milestone-3'
 }

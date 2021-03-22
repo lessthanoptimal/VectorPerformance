@@ -12,20 +12,14 @@ java {
 javadoc { configure(options) { enabled=false } }
 test { useJUnitPlatform() }
 
-tasks.withType(AbstractCompile) {
-    options.compilerArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
-}
+var incubatorArguments = ["--enable-preview","--add-modules", "jdk.incubator.vector"]
 
-tasks.withType(Test) {
-    jvmArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
-}
+tasks.withType(AbstractCompile) { options.compilerArgs += incubatorArguments }
+tasks.withType(Test) { jvmArgs += incubatorArguments }
 
 repositories {
     mavenCentral()
     mavenLocal()
-
-    maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url = 'https://jitpack.io' } // Allows annotations past Java 8 to be used
 }
 
 dependencies {
@@ -35,11 +29,10 @@ dependencies {
     }
 
     ['ejml-core','ejml-ddense'].each { String a ->
-        api group: 'org.ejml', name: a, version: '0.40'}
+        api group: 'org.ejml', name: a, version: '0.40' }
 
-    ['boofcv-ip'].each {
-        String a -> implementation group: 'org.boofcv', name: a, version: '0.36'
-    }
+    ['boofcv-ip'].each { String a ->
+        implementation group: 'org.boofcv', name: a, version: '0.36' }
 
     testImplementation( 'org.junit.jupiter:junit-jupiter-api:5.4.0')
     testRuntimeOnly( 'org.junit.jupiter:junit-jupiter-engine:5.4.0')
@@ -47,10 +40,8 @@ dependencies {
 
 task runtimeBenchmark(type: JavaExec) {
     dependsOn build
-    javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(16)
-    }
-    jvmArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(16) }
+    jvmArgs += incubatorArguments
     group = "Execution"
     description = "Runs the benchmark code"
     classpath = sourceSets.main.runtimeClasspath

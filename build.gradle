@@ -1,0 +1,69 @@
+apply plugin: 'java'
+
+group 'lessthanoptimal'
+version '0.1'
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+    toolchain { languageVersion = JavaLanguageVersion.of(16) }
+}
+
+//tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
+//tasks.withType(JavaCompile) { options.incremental = true }
+//tasks.withType(JavaCompile) { options.compilerArgs.addAll([
+//        '--enable-preview','--add-modules',
+//        'jdk.incubator.vector']) }
+
+//tasks.withType(JavaCompile) {
+//    options.compilerArgs.addAll(["--enable-preview",'--add-modules','jdk.incubator.vector'])
+//}
+//tasks.withType(Test) {
+//    jvmArgs.addAll(["--enable-preview",'--add-modules','jdk.incubator.vector'])
+//}
+//tasks.withType(JavaExec) {
+//    jvmArgs.addAll(["--enable-preview",'--add-modules','jdk.incubator.vector'])
+//}
+
+compileJava {
+    options.compilerArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
+}
+
+compileTestJava {
+    options.compilerArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
+}
+
+test {
+    jvmArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
+}
+
+tasks.withType( JavaCompile ).configureEach {
+    options.forkOptions.jvmArgs.addAll( ['--add-opens', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'] )
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+
+    maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url = 'https://jitpack.io' } // Allows annotations past Java 8 to be used
+}
+
+dependencies {
+    ['1.27'].each { String a ->
+        compile('org.openjdk.jmh:jmh-core:' + a)
+        annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:' + a
+    }
+
+    ['ejml-core','ejml-ddense'].each { String a ->
+        compile group: 'org.ejml', name: a, version: '0.40'}
+
+    testImplementation( 'org.junit.jupiter:junit-jupiter-api:5.4.0')
+    testRuntimeOnly( 'org.junit.jupiter:junit-jupiter-engine:5.4.0')
+}
+
+
+wrapper {
+    distributionType = Wrapper.DistributionType.BIN
+    gradleVersion = '6.8.3'
+}

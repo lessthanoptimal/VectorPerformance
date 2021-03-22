@@ -41,6 +41,18 @@ dependencies {
     testRuntimeOnly( 'org.junit.jupiter:junit-jupiter-engine:5.4.0')
 }
 
+task runtimeBenchmark(type: JavaExec) {
+    dependsOn build
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+    jvmArgs += ["--enable-preview","--add-modules", "jdk.incubator.vector"]
+    group = "Execution"
+    description = "Runs the benchmark code"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "benchmark.BenchmarkOperations"
+}
+
 
 wrapper {
     distributionType = Wrapper.DistributionType.BIN

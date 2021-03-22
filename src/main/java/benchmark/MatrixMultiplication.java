@@ -89,45 +89,34 @@ public class MatrixMultiplication {
     public static void mult_reorder_vector(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
         C.reshape(A.numRows, B.numCols);
 
-        final int endOfKLoop = B.numRows * B.numCols;
-
         for (int i = 0; i < A.numRows; i++) {
             int indexCbase = i * C.numCols;
-            int indexA = i * A.numCols;
 
-            // need to assign C.data to a value initially
-            int indexB = 0;
+            {
+                double valA = A.data[i * A.numCols];
+                for (int j = 0; j < B.numCols; j += SPECIES.length()) {
+                    var m = SPECIES.indexInRange(j, B.numCols);
+                    var vb = DoubleVector.fromArray(SPECIES, B.data, j, m);
 
-            double valA = A.data[indexA++];
-
-            for (int j = 0; j < B.numCols; j += SPECIES.length()) {
-                var m = SPECIES.indexInRange(i, B.numCols);
-                var vb = DoubleVector.fromArray(SPECIES, B.data, j, m);
-                var vc = vb.mul(valA);
-                vc.intoArray(C.data, indexCbase + j, m);
+                    var n = SPECIES.indexInRange(indexCbase+j, indexCbase+B.numCols);
+                    vb.mul(valA).intoArray(C.data, indexCbase + j, n);
+                }
             }
 
-//            // now add to it
-//            for (int k = B.numCols; k < endOfKLoop; k++) {
-//                valA = A.data[indexA++];
-//
-//                for (int j = 0; j < B.numCols; j += SPECIES.length()) {
-//                    var m = SPECIES.indexInRange(i, B.numCols);
-//                    var vb = DoubleVector.fromArray(SPECIES, B.data, k, m);
-//                    var vc = DoubleVector.fromArray(SPECIES, C.data, indexCbase, m);
-//                    vb.mul(valA).add(vc).intoArray(C.data,indexCbase);
-//                }
-//            }
-//            while (indexB != endOfKLoop) { // k loop
-//                indexC = indexCbase;
-//                end = indexB + B.numCols;
-//
-//                valA = A.data[indexA++];
-//
-//                while (indexB < end) { // j loop
-//                    C.data[indexC++] += valA * B.data[indexB++];
-//                }
-//            }
+            for (int k = 1; k < B.numRows; k++) {
+                int indexB = k * B.numCols;
+
+                double valA = A.data[i * A.numCols + k];
+
+                for (int j = 0; j < B.numCols; j += SPECIES.length()) {
+                    var m = SPECIES.indexInRange(indexB+j, indexB+B.numCols);
+                    var vb = DoubleVector.fromArray(SPECIES, B.data, indexB+j, m);
+
+                    var n = SPECIES.indexInRange(indexCbase+j, indexCbase+B.numCols);
+                    var vc = DoubleVector.fromArray(SPECIES, C.data, indexCbase+j, n);
+                    vc.add(vb.mul(valA)).intoArray(C.data, indexCbase+j, n);
+                }
+            }
         }
     }
 }

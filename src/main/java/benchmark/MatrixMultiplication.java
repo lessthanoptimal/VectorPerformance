@@ -94,12 +94,13 @@ public class MatrixMultiplication {
 
             {
                 double valA = A.data[i * A.numCols];
-                for (int j = 0; j < B.numCols; j += SPECIES.length()) {
-                    var m = SPECIES.indexInRange(j, B.numCols);
-                    var vb = DoubleVector.fromArray(SPECIES, B.data, j, m);
-
-                    var n = SPECIES.indexInRange(indexCbase+j, indexCbase+B.numCols);
-                    vb.mul(valA).intoArray(C.data, indexCbase + j, n);
+                int j;
+                for (j = 0; j < SPECIES.loopBound(B.numCols); j += SPECIES.length()) {
+                    var vb = DoubleVector.fromArray(SPECIES, B.data, j);
+                    vb.mul(valA).intoArray(C.data, indexCbase + j);
+                }
+                for (; j < B.numCols; j++) {
+                    C.data[indexCbase + j] = valA * B.data[j];
                 }
             }
 
@@ -108,13 +109,15 @@ public class MatrixMultiplication {
 
                 double valA = A.data[i * A.numCols + k];
 
-                for (int j = 0; j < B.numCols; j += SPECIES.length()) {
-                    var m = SPECIES.indexInRange(indexB+j, indexB+B.numCols);
-                    var vb = DoubleVector.fromArray(SPECIES, B.data, indexB+j, m);
+                int j;
+                for (j = 0; j < SPECIES.loopBound(B.numCols); j += SPECIES.length()) {
+                    var vb = DoubleVector.fromArray(SPECIES, B.data, indexB + j);
+                    var vc = DoubleVector.fromArray(SPECIES, C.data, indexCbase + j);
+                    vc.add(vb.mul(valA)).intoArray(C.data, indexCbase + j);
+                }
 
-                    var n = SPECIES.indexInRange(indexCbase+j, indexCbase+B.numCols);
-                    var vc = DoubleVector.fromArray(SPECIES, C.data, indexCbase+j, n);
-                    vc.add(vb.mul(valA)).intoArray(C.data, indexCbase+j, n);
+                for (; j < B.numCols; j++) {
+                    C.data[indexCbase + j] += valA * B.data[indexB + j];
                 }
             }
         }

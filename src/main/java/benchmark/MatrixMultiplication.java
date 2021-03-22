@@ -12,7 +12,8 @@ public class MatrixMultiplication {
 
     /**
      * Matrix multiplication with IKJ ordering from EJML. This is designed to minimize cache misses and is a
-     * top performer in internal benchmarks.
+     * top performer in internal benchmarks. For larger matrices EJML switches to a block multiplication, which
+     * is excessively complex for this benchmark.
      */
     public static void mult_reorder(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
         C.reshape(A.numRows, B.numCols);

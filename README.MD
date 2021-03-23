@@ -24,21 +24,20 @@ Setup
 
 Summary
 ```
-Operation                     | Data |     Size     |     |   Relative  |
-                              | Type |              |     | Performance |
+Operation                    | Data |     Size     |  Relative   |
+                             | Type |              | Performance |
 -----------------------------------------------------------------------------------------
-Matrix Mult IKJ               |   D  | Large Matrix | [1] |     1.84    |
-Matrix Mult IKJ               |   D  | Small Matrix [ [2] |      .86    |
-Matrix Mult IKJ Complex       |   D  | Large Matrix |     |             | Vector code needed
-Matrix Mult IKJ Complex       |   D  | Small Matrix [     |             | Vector code needed
-Image 1D Conv                 |   F  | Large kernel |     |     1.82    | 
-Image 1D Conv                 |   F  | Small kernel |     |     1.86    |
-Image 1D Conv  BoofCV         |   F  | Small kernel | [3] |      .41    | Compared to unrolled
-Image 1D Mean                 |   F  |              |     |             | Vector code needed
-Image Threshold               |  U8  |              | [4] |     6.78    |
-Image Histogram               |  U16 |              |     |             | Vector code needed
+Matrix Mult IKJ              |   D  | Large Matrix |    1.84     | [1]
+Matrix Mult IKJ              |   D  | Small Matrix |     .86     | [2]
+Matrix Mult IKJ Complex      |   D  | Large Matrix |             | Vector code needed
+Matrix Mult IKJ Complex      |   D  | Small Matrix |             | Vector code needed
+Image 1D Conv                |   F  | Large kernel |    1.82     | 
+Image 1D Conv                |   F  | Small kernel |    1.86     |
+Image 1D Conv  BoofCV        |   F  | Small kernel |     .41     | [3] Compared to unrolled
+Image 1D Mean                |   F  |              |             | Vector code needed
+Image Threshold              |  U8  |              |    6.78     | [4]
+Image Histogram              |  U16 |              |             | Vector code needed
 ```
-
 Unless otherwise stated, all performance is baseline code over vectorized code. Values > 1 mean vectorized code was
 faster and values < 1 mean vectorized was slower. In some cases unrolled code from EJML and BoofCV have been
 included to provide a point of comparison.

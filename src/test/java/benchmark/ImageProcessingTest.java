@@ -33,7 +33,7 @@ class ImageProcessingTest {
     }
 
     @Disabled
-    @Test void threshold_vector() {
+    @Test void threshold_vector_v1() {
         GrayU8 src = new GrayU8(imageSize, imageSize);
         GrayU8 expected = src.createSameShape();
         GrayU8 found = src.createSameShape();
@@ -41,7 +41,21 @@ class ImageProcessingTest {
         ImageMiscOps.fillUniform(src, rand, 0, 255);
 
         ImageProcessing.threshold(src, expected, 125);
-        ImageProcessing.threshold_vector(src, found, 125);
+        ImageProcessing.threshold_vector_v1(src, found, 125);
+
+        BoofTesting.assertEquals(expected, found, UtilEjml.TEST_F32);
+    }
+
+    @Disabled
+    @Test void threshold_vector_v2() {
+        GrayU8 src = new GrayU8(imageSize, imageSize);
+        GrayU8 expected = src.createSameShape();
+        GrayU8 found = src.createSameShape();
+
+        ImageMiscOps.fillUniform(src, rand, 0, 255);
+
+        ImageProcessing.threshold(src, expected, 125);
+        ImageProcessing.threshold_vector_v2(src, found, 125);
 
         BoofTesting.assertEquals(expected, found, UtilEjml.TEST_F32);
     }

@@ -3,6 +3,7 @@ package benchmark;
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
 import org.ejml.data.DMatrix1Row;
+import org.ejml.data.ZMatrixRMaj;
 
 /**
  * @author Peter Abeles
@@ -15,7 +16,7 @@ public class MatrixMultiplication {
      * top performer in internal benchmarks. For larger matrices EJML switches to a block multiplication, which
      * is excessively complex for this benchmark.
      */
-    public static void mult_reorder(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
+    public static void mult_ikj(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
         C.reshape(A.numRows, B.numCols);
 
         // Note to people looking at this code. It might look like there is a bunch of unnecessary hand optimizations.
@@ -60,7 +61,7 @@ public class MatrixMultiplication {
         }
     }
 
-    public static void mult_reorder_simple(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
+    public static void mult_ikj_simple(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
         C.reshape(A.numRows, B.numCols);
 
         for (int i = 0; i < A.numRows; i++) {
@@ -87,7 +88,7 @@ public class MatrixMultiplication {
         }
     }
 
-    public static void mult_reorder_vector(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
+    public static void mult_ikj_vector(DMatrix1Row A, DMatrix1Row B, DMatrix1Row C) {
         C.reshape(A.numRows, B.numCols);
 
         for (int i = 0; i < A.numRows; i++) {
@@ -121,6 +122,56 @@ public class MatrixMultiplication {
                     C.data[indexCbase + j] += valA * B.data[indexB + j];
                 }
             }
+        }
+    }
+
+    // Matrix multiplication for a complex matrix
+    public static void mult_ikj(ZMatrixRMaj a , ZMatrixRMaj b , ZMatrixRMaj c)
+    {
+        double realA,imagA;
+
+        int indexCbase= 0;
+        int strideA = a.getRowStride();
+        int strideB = b.getRowStride();
+        int strideC = c.getRowStride();
+        int endOfKLoop = b.numRows*strideB;
+
+        for( int i = 0; i < a.numRows; i++ ) {
+            int indexA = i*strideA;
+
+            // need to assign c.data to a value initially
+            int indexB = 0;
+            int indexC = indexCbase;
+            int end = indexB + strideB;
+
+            realA = a.data[indexA++];
+            imagA = a.data[indexA++];
+
+            while( indexB < end ) {
+                double realB = b.data[indexB++];
+                double imgB = b.data[indexB++];
+
+                c.data[indexC++] = realA*realB - imagA*imgB;
+                c.data[indexC++] = realA*imgB + imagA*realB;
+            }
+
+            // now add to it
+            while( indexB != endOfKLoop ) { // k loop
+                indexC = indexCbase;
+                end = indexB + strideB;
+
+                realA = a.data[indexA++];
+                imagA = a.data[indexA++];
+
+                while( indexB < end ) { // j loop
+                    double realB = b.data[indexB++];
+                    double imgB = b.data[indexB++];
+
+                    c.data[indexC++] += realA*realB - imagA*imgB;
+                    c.data[indexC++] += realA*imgB + imagA*realB;
+                }
+            }
+            indexCbase += strideC;
         }
     }
 }

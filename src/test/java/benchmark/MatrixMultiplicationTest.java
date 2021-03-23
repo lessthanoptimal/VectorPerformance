@@ -23,8 +23,8 @@ class MatrixMultiplicationTest {
         DMatrixRMaj found = RandomMatrices_DDRM.rectangle(N, N, rand);
         DMatrixRMaj expected = found.copy();
 
-        MatrixMultiplication.mult_reorder_simple(A,B,found);
-        MatrixMultiplication.mult_reorder(A,B,expected);
+        MatrixMultiplication.mult_ikj_simple(A,B,found);
+        MatrixMultiplication.mult_ikj(A,B,expected);
 
         assertTrue(MatrixFeatures_DDRM.isIdentical(found, expected, UtilEjml.TEST_F64));
     }
@@ -36,8 +36,8 @@ class MatrixMultiplicationTest {
         DMatrixRMaj found = RandomMatrices_DDRM.rectangle(N, N, rand);
         DMatrixRMaj expected = found.copy();
 
-        MatrixMultiplication.mult_reorder_vector(A,B,found);
-        MatrixMultiplication.mult_reorder_simple(A,B,expected);
+        MatrixMultiplication.mult_ikj_vector(A,B,found);
+        MatrixMultiplication.mult_ikj_simple(A,B,expected);
 
         assertTrue(MatrixFeatures_DDRM.isIdentical(found, expected, UtilEjml.TEST_F64));
     }

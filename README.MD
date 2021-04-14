@@ -37,6 +37,8 @@ Image 1D Conv  BoofCV        |   F  | Small kernel |     .41     | [3] Compared 
 Image 1D Mean                |   F  |              |             | Vector code needed
 Image Threshold              |  U8  |              |    6.78     | [4]
 Image Histogram              |  U16 |              |             | Vector code needed
+YUV 420 888 to RGB           |   D  |              |             | Vector code needed
+Image Debayer                |   D  |              |             | Vector code needed
 ```
 Unless otherwise stated, all performance is baseline code over vectorized code. Values > 1 mean vectorized code was
 faster and values < 1 mean vectorized was slower. In some cases unrolled code from EJML and BoofCV have been

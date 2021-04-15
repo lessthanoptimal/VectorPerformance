@@ -118,55 +118,63 @@ public class BenchmarkOperations {
         }
     }
 
-    @Benchmark public void matrix_mult(MatrixState state) {
-        MatrixMultiplication.mult_ikj(state.A, state.B, state.C);
-    }
-
-    @Benchmark public void matrix_mult_ejml(MatrixState state) {
-        // There is specialized code for small matrices here and if large enough a block matrix will kick in
-        CommonOps_DDRM.mult(state.A, state.B, state.C);
-    }
-
-    @Benchmark public void matrix_mult_vectors(MatrixState state) {
-        MatrixMultiplication.mult_ikj_vector(state.A, state.B, state.C);
-    }
-
-    @Benchmark public void matrix_mult_complex(MatrixState state) {
-        MatrixMultiplication.mult_ikj(state.CA, state.CB, state.CC);
-    }
-
-    @Benchmark public void convolve_horizontal(FloatImageState state) {
-        ImageProcessing.horizontal(state.kernel, state.src, state.dst);
-    }
-
-    @Benchmark public void convolve_horizontal_vector(FloatImageState state) {
-        ImageProcessing.horizontal_vector(state.kernel, state.src, state.dst);
-    }
-
-    @Benchmark public void convolve_horizontal_boofcv(FloatImageState state) {
-        // If possible this method will run an unrolled kernel
-        ConvolveImageNoBorder.horizontal(state.kernel, state.src, state.dst);
-    }
+//    @Benchmark public void matrix_mult_real(MatrixState state) {
+//        MatrixMultiplication.mult_ikj(state.A, state.B, state.C);
+//    }
+//
+//    @Benchmark public void matrix_mult_real_ejml(MatrixState state) {
+//        // There is specialized code for small matrices here and if large enough a block matrix will kick in
+//        CommonOps_DDRM.mult(state.A, state.B, state.C);
+//    }
+//
+//    @Benchmark public void matrix_mult_real_vectors(MatrixState state) {
+//        MatrixMultiplication.mult_ikj_vector(state.A, state.B, state.C);
+//    }
+//
+//    @Benchmark public void matrix_mult_complex(MatrixState state) {
+//        MatrixMultiplication.mult_ikj(state.CA, state.CB, state.CC);
+//    }
+//
+//    @Benchmark public void matrix_mult_complex_vector(MatrixState state) {
+//        MatrixMultiplication.mult_ikj_vector(state.CA, state.CB, state.CC);
+//    }
+//
+//    @Benchmark public void convolve_horizontal(FloatImageState state) {
+//        ImageProcessing.horizontal(state.kernel, state.src, state.dst);
+//    }
+//
+//    @Benchmark public void convolve_horizontal_vector(FloatImageState state) {
+//        ImageProcessing.horizontal_vector(state.kernel, state.src, state.dst);
+//    }
+//
+//    @Benchmark public void convolve_horizontal_boofcv(FloatImageState state) {
+//        // If possible this method will run an unrolled kernel
+//        ConvolveImageNoBorder.horizontal(state.kernel, state.src, state.dst);
+//    }
 
     @Benchmark public void mean_horizontal(ByteImageState state) {
         ImageProcessing.mean_horizontal(state.src, state.dst, 5, 11);
     }
 
-    @Benchmark public void image_threshold(ByteImageState state) {
-        ImageProcessing.threshold(state.src, state.dst, 125);
+    @Benchmark public void mean_horizontal_vector(ByteImageState state) {
+        ImageProcessing.mean_horizontal_vector(state.src, state.dst, 5, 11);
     }
 
-    @Benchmark public void image_threshold_vector_v1(ByteImageState state) {
-        ImageProcessing.threshold_vector_v1(state.src, state.dst, 125);
-    }
-
-    @Benchmark public void image_threshold_vector_v2(ByteImageState state) {
-        ImageProcessing.threshold_vector_v2(state.src, state.dst, 125);
-    }
-
-    @Benchmark public void histogram(ShortImageState state) {
-        ImageProcessing.histogram(state.src, 0, state.histogram);
-    }
+//    @Benchmark public void image_threshold(ByteImageState state) {
+//        ImageProcessing.threshold(state.src, state.dst, 125);
+//    }
+//
+//    @Benchmark public void image_threshold_vector_v1(ByteImageState state) {
+//        ImageProcessing.threshold_vector_v1(state.src, state.dst, 125);
+//    }
+//
+//    @Benchmark public void image_threshold_vector_v2(ByteImageState state) {
+//        ImageProcessing.threshold_vector_v2(state.src, state.dst, 125);
+//    }
+//
+//    @Benchmark public void histogram(ShortImageState state) {
+//        ImageProcessing.histogram(state.src, 0, state.histogram);
+//    }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()

@@ -93,7 +93,6 @@ public class MatrixMultiplication {
 
         for (int i = 0; i < A.numRows; i++) {
             int indexCbase = i * C.numCols;
-
             {
                 double valA = A.data[i * A.numCols];
                 int j;
@@ -126,49 +125,126 @@ public class MatrixMultiplication {
     }
 
     // Matrix multiplication for a complex matrix
-    public static void mult_ikj(ZMatrixRMaj a , ZMatrixRMaj b , ZMatrixRMaj c)
-    {
-        double realA,imagA;
+    public static void mult_ikj(ZMatrixRMaj A, ZMatrixRMaj B, ZMatrixRMaj C) {
+        double realA, imagA;
 
-        int indexCbase= 0;
-        int strideA = a.getRowStride();
-        int strideB = b.getRowStride();
-        int strideC = c.getRowStride();
-        int endOfKLoop = b.numRows*strideB;
+        int indexCbase = 0;
+        int strideA = A.getRowStride();
+        int strideB = B.getRowStride();
+        int strideC = C.getRowStride();
+        int endOfKLoop = B.numRows * strideB;
 
-        for( int i = 0; i < a.numRows; i++ ) {
-            int indexA = i*strideA;
+        for (int i = 0; i < A.numRows; i++) {
+            int indexA = i * strideA;
 
             // need to assign c.data to a value initially
             int indexB = 0;
             int indexC = indexCbase;
             int end = indexB + strideB;
 
-            realA = a.data[indexA++];
-            imagA = a.data[indexA++];
+            realA = A.data[indexA++];
+            imagA = A.data[indexA++];
 
-            while( indexB < end ) {
-                double realB = b.data[indexB++];
-                double imgB = b.data[indexB++];
+            while (indexB < end) {
+                double realB = B.data[indexB++];
+                double imagB = B.data[indexB++];
 
-                c.data[indexC++] = realA*realB - imagA*imgB;
-                c.data[indexC++] = realA*imgB + imagA*realB;
+                C.data[indexC++] = realA * realB - imagA * imagB;
+                C.data[indexC++] = realA * imagB + imagA * realB;
             }
 
             // now add to it
-            while( indexB != endOfKLoop ) { // k loop
+            while (indexB != endOfKLoop) { // k loop
                 indexC = indexCbase;
                 end = indexB + strideB;
 
-                realA = a.data[indexA++];
-                imagA = a.data[indexA++];
+                realA = A.data[indexA++];
+                imagA = A.data[indexA++];
 
-                while( indexB < end ) { // j loop
-                    double realB = b.data[indexB++];
-                    double imgB = b.data[indexB++];
+                while (indexB < end) { // j loop
+                    double realB = B.data[indexB++];
+                    double imagB = B.data[indexB++];
 
-                    c.data[indexC++] += realA*realB - imagA*imgB;
-                    c.data[indexC++] += realA*imgB + imagA*realB;
+                    C.data[indexC++] += realA * realB - imagA * imagB;
+                    C.data[indexC++] += realA * imagB + imagA * realB;
+                }
+            }
+            indexCbase += strideC;
+        }
+    }
+
+    public static void mult_ikj_vector(ZMatrixRMaj A, ZMatrixRMaj B, ZMatrixRMaj C) {
+        double realA, imagA;
+
+        int indexCbase = 0;
+        int strideA = A.getRowStride();
+        int strideB = B.getRowStride();
+        int strideC = C.getRowStride();
+        int endOfKLoop = B.numRows * strideB;
+
+        final int speciesLength = SPECIES.length();
+        double[] multiRealA = new double[speciesLength];
+        double[] multiImagA = new double[speciesLength];
+
+        if (speciesLength % 2 != 0)
+            throw new RuntimeException("Code below assumes an even length");
+
+        for (int i = 0; i < A.numRows; i++) {
+            int indexA = i * strideA;
+
+            // need to assign c.data to a value initially
+            int indexB = 0;
+            int indexC = indexCbase;
+            int end = indexB + strideB;
+
+            realA = A.data[indexA++];
+            imagA = A.data[indexA++];
+
+            for (; indexB < SPECIES.loopBound(B.numCols); indexB += SPECIES.length()) {
+                var vb = DoubleVector.fromArray(SPECIES, B.data, indexB);
+                vb.mul(realA).intoArray(multiRealA, 0);
+                vb.mul(imagA).intoArray(multiImagA, 0);
+
+                // TODO figure out how to use shuffle to re-order the arrays quickly
+                for (int j = 0; j < speciesLength; j += 2) {
+                    C.data[indexC++] = multiRealA[j] - multiImagA[j + 1];
+                    C.data[indexC++] = multiRealA[j + 1] + multiImagA[j];
+                }
+            }
+
+            while (indexB < end) {
+                double realB = B.data[indexB++];
+                double imagB = B.data[indexB++];
+
+                C.data[indexC++] = realA * realB - imagA * imagB;
+                C.data[indexC++] = realA * imagB + imagA * realB;
+            }
+
+            // now add to it
+            while (indexB != endOfKLoop) { // k loop
+                indexC = indexCbase;
+                end = indexB + strideB;
+
+                realA = A.data[indexA++];
+                imagA = A.data[indexA++];
+
+                for (; indexB < SPECIES.loopBound(B.numCols); indexB += SPECIES.length()) {
+                    var vb = DoubleVector.fromArray(SPECIES, B.data, indexB);
+                    vb.mul(realA).intoArray(multiRealA, 0);
+                    vb.mul(imagA).intoArray(multiImagA, 0);
+
+                    for (int j = 0; j < speciesLength; j += 2) {
+                        C.data[indexC++] += multiRealA[j] - multiImagA[j + 1];
+                        C.data[indexC++] += multiRealA[j + 1] + multiImagA[j];
+                    }
+                }
+
+                while (indexB < end) { // j loop
+                    double realB = B.data[indexB++];
+                    double imgB = B.data[indexB++];
+
+                    C.data[indexC++] += realA * realB - imagA * imgB;
+                    C.data[indexC++] += realA * imgB + imagA * realB;
                 }
             }
             indexCbase += strideC;

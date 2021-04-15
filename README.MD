@@ -15,6 +15,11 @@ that will take about 12 minutes to complete.
 If you load this up in your favorite IDE (in my case IntelliJ) you're highly likely to experience issues. This
 is using bleeding edge version of Gradle with a bleeding edge JDK, and a new API.
 
+# Learning About Vector API
+
+* https://richardstartin.github.io/posts/vectorised-algorithms-in-java
+
+
 # Results
 
 Setup
@@ -27,8 +32,8 @@ Summary
 Operation                    | Data |     Size     |  Relative   |
                              | Type |              | Performance |
 -----------------------------------------------------------------------------------------
-Matrix Mult IKJ              |   D  | Large Matrix |    1.84     | [1]
-Matrix Mult IKJ              |   D  | Small Matrix |     .86     | [2]
+Matrix Mult IKJ Real         |   D  | Large Matrix |    1.84     | [1]
+Matrix Mult IKJ Real         |   D  | Small Matrix |     .86     | [2]
 Matrix Mult IKJ Complex      |   D  | Large Matrix |             | Vector code needed
 Matrix Mult IKJ Complex      |   D  | Small Matrix |             | Vector code needed
 Image 1D Conv                |   F  | Large kernel |    1.82     | 

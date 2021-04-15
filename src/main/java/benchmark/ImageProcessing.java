@@ -102,6 +102,43 @@ public class ImageProcessing {
         //CONCURRENT_ABOVE });
     }
 
+    public static void mean_horizontal_vector(GrayU8 input , GrayI8 output, int offset, int length ) {
+        final int divisor = length;
+        final int halfDivisor = divisor/2;
+
+        short[] tmp = new short[input.width];
+
+        //CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
+        for( int y = 0; y < input.height; y++ ) {
+            int indexIn = input.startIndex + input.stride*y;
+            int indexOut = output.startIndex + output.stride*y + offset;
+
+            int total = 0;
+
+            int indexEnd = indexIn + length;
+
+            for (; indexIn < indexEnd; indexIn++) {
+                total += input.data[indexIn] & 0xFF;
+            }
+            output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
+
+            // TODO 1) first pass compute the result of summing the head and the tail. Like the code below
+            //
+
+            final int end = input.width-length;
+            for (int i = 0, idx=indexIn; i < end; i++, idx++) {
+                tmp[i] = (short)((input.data[idx] & 0xFF) - (input.data[idx - length] & 0xFF));
+            }
+
+            indexEnd = indexIn + input.width - length;
+            for (int i = 0; indexIn < indexEnd; i++, indexIn++) {
+                total += tmp[i];
+                output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
+            }
+        }
+        //CONCURRENT_ABOVE });
+    }
+
     public static GrayU8 threshold( GrayU8 input, GrayU8 output, int threshold ) {
         //CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
         for( int y = 0; y < input.height; y++ ) {
@@ -174,6 +211,31 @@ public class ImageProcessing {
         for( int y = 0; y < input.height; y++ ) {
             int index = input.startIndex + y*input.stride;
             int end = index + input.width;
+
+            while( index < end ) {
+                histogram[(input.data[index++]& 0xFFFF) - minValue ]++;
+            }
+        }
+    }
+
+    public static void histogram_vector(GrayU16 input, int minValue, int[] histogram ) {
+        Arrays.fill(histogram,0);
+
+        VectorSpecies<Short> SPECIES = ShortVector.SPECIES_PREFERRED;
+
+        for( int y = 0; y < input.height; y++ ) {
+            int index = input.startIndex + y*input.stride;
+            int end = index + input.width;
+
+            for(; index < SPECIES.loopBound(input.width); index += SPECIES.length() ) {
+                var vinput = ShortVector.fromArray(SPECIES, input.data, index);
+                // NOTE: This will yield incorrect results because JDK doesn't support unsigned comparisons
+                vinput.sub((short)minValue);
+
+                // can I convert this into a mask? what if the same element is referenced more than once?
+
+                // TODO is it possible to vectorize incrementing different array elements? I suspect not...
+            }
 
             while( index < end ) {
                 histogram[(input.data[index++]& 0xFFFF) - minValue ]++;
